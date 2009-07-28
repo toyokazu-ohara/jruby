@@ -39,6 +39,7 @@ public class RubyWIN32OLE extends RubyObject {
     private static final int INVOKE_PROPERTYPUTREF = ActiveXComponent.Put;
     private ActiveXComponent ax = null;
     private Dispatch  dispatch = null;
+    private static boolean DEBUG = true;
 
     public static RubyClass createWIN32OLE(Ruby runtime) {
         RubyClass result = runtime.defineClass("WIN32OLE", runtime.getObject(), WIN32OLE_ALLOCATOR);
@@ -76,9 +77,9 @@ public class RubyWIN32OLE extends RubyObject {
     public static IRubyObject method_missing(ThreadContext context, IRubyObject recv, IRubyObject[] args, Block block) {
 try {
         if (args.length == 0 || !(args[0] instanceof RubySymbol)) throw context.getRuntime().newArgumentError("no id given");
-        System.out.println("length : " + args.length);
+        log("length : " + args.length);
         for (int i = 0; i < args.length; i++) {
-            System.out.println("arg [" + i + "] : value = " + args[i] + " type : " + args[i].getClass());
+            log("arg [" + i + "] : value = " + args[i] + " type : " + args[i].getClass());
         }
 
         RubyWIN32OLE self  = (RubyWIN32OLE) recv;
@@ -163,7 +164,7 @@ try {
 
     private static void setProperty(Dispatch dispatch, String propName, IRubyObject value) {
         if (value instanceof RubyMethod) {
-            // TODO for method
+            // TODO method
         } else {
             Dispatch.put(dispatch, propName, getWin32Arg(value));
         }
@@ -233,7 +234,7 @@ try {
     }
 
     private static Object[] getWin32Arg(Dispatch dispatch, RubyHash arg) {
-System.out.println("RubyHash");
+log("RubyHash");
         String[] names  = new String[arg.directKeySet().size()];
         Object[] values = new Object[arg.directKeySet().size()];
         int pos         = 0;
@@ -242,7 +243,7 @@ System.out.println("RubyHash");
             IRubyObject value = (IRubyObject) arg.fastARef(key);
             names[pos]        = key.asJavaString();
             values[pos]       = getWin32Arg(value);
-System.out.println("key : " + key + " value : " + value);
+log("key : " + key + " value : " + value);
             pos ++;
         }
         int[] ids  = Dispatch.getIDsOfNames(dispatch, names);
@@ -263,7 +264,7 @@ System.out.println("key : " + key + " value : " + value);
 
     private static IRubyObject getVariantValue(Ruby runtime, Variant variant, RubyWIN32OLE self){
         IRubyObject result = null;
-        System.out.println("variant type: " + variant.getvt());
+        log("variant type: " + variant.getvt());
         // TODO check bindings
         switch(variant.getvt()) {
             case Variant.VariantEmpty://0
@@ -326,7 +327,7 @@ System.out.println("key : " + key + " value : " + value);
         if (result == null) {
             result =  self;
         }
-        System.out.println("result : " + result);
+        log("result : " + result);
         return result;
     }
 
@@ -349,7 +350,11 @@ System.out.println("key : " + key + " value : " + value);
             RubyWIN32OLE.createWIN32OLE(runtime);
         }
     }
-
+    private static final void log(String message) {
+        if (DEBUG) {
+            log(message);
+        }
+    }
 
 //    @JRubyClass(name="WIN32OLE_TYPE")
 //    public static class RubyWIN32OLE_TYPE extends RubyObject {
