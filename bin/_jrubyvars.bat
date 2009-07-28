@@ -25,7 +25,7 @@ set JRUBY_BAT_ERROR=1
 exit /b 1
 :gotJava
 
-set JRUBY_HOME=%~dp0..
+call :setjrubyhome %~dp0..
 
 rem ----- Prepare Appropriate Java Execution Commands -------------------------
 
@@ -77,3 +77,8 @@ goto :EOF
 :add
 set CP=%CP%;%*
 goto :EOF
+
+:setjrubyhome
+set JRUBY_HOME=%~dpn1
+goto :EOF
+
